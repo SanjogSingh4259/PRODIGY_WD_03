@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: pointer;
+            border: 1px solid #000;
+        }
+        .cell:hover {
+            background-color: #f1f1f1;
+        }
+        .status {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tic-Tac-Toe</h1>
+    <div class="board">
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+    </div>
+    <div class="status"></div>
+    <script>
+        const cells = document.querySelectorAll('[data-cell]');
+        const statusDiv = document.querySelector('.status');
+        let isXTurn = true;
+
+        const winningCombinations = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        const handleClick = (e) => {
+            const cell = e.target;
+            const currentClass = isXTurn ? 'X' : 'O';
+            placeMark(cell, currentClass);
+            if (checkWin(currentClass)) {
+                endGame(false);
+            } else if (isDraw()) {
+                endGame(true);
+            } else {
+                swapTurns();
+            }
+        };
+
+        const placeMark = (cell, currentClass) => {
+            cell.textContent = currentClass;
+            cell.removeEventListener('click', handleClick);
+        };
+
+        const swapTurns = () => {
+            isXTurn = !isXTurn;
+            statusDiv.textContent = `${isXTurn ? "X" : "O"}'s turn`;
+        };
+
+        const checkWin = (currentClass) => {
+            return winningCombinations.some(combination => {
+                return combination.every(index => {
+                    return cells[index].textContent === currentClass;
+                });
+            });
+        };
+
+        const isDraw = () => {
+            return [...cells].every(cell => {
+                return cell.textContent === 'X' || cell.textContent === 'O';
+            });
+        };
+
+        const endGame = (draw) => {
+            if (draw) {
+                statusDiv.textContent = 'Draw!';
+            } else {
+                statusDiv.textContent = `${isXTurn ? "X" : "O"} Wins!`;
+            }
+            cells.forEach(cell => {
+                cell.removeEventListener('click', handleClick);
+            });
+        };
+
+        const startGame = () => {
+            isXTurn = true;
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.addEventListener('click', handleClick, { once: true });
+            });
+            statusDiv.textContent = "X's turn";
+        };
+
+        startGame();
+    </script>
+</body>
+</html>
